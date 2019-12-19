@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/sign.css">
+{% endblock %}
+
+{% block content %}
+<div class="text-center" id="login">
+  <form class="form-sign" method="POST" action="{{ url_for('auth.login') }}">
+    {{ form.hidden_tag() }}
+    <h1 class="h3 mb-3 font-weight-normal">Login</h1>
+    <div class="from-group input-group mb-3">
+      {{ form.email.label }}
+      {{ form.email(class_='form-control') }}
+      {% if form.email.errors %}
+      <div class="invalid-feedback">
+        {% for error in form.email.errors %}{{ error }}{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    <div class="form-group">
+      {{ form.password.label }}
+      {{ form.password(class_='form-control') }}
+      {% if form.password.errors %}
+      <div class="invalid-feedback">
+        {% for error in form.password.errors %}{{ error }}{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+  </form>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-dismissible fade show message {{ category }}" role="alert">
+        <span id="message">
+          {{ message }}
+        </span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+  {% endwith %}
+</div>
+{% endblock %}

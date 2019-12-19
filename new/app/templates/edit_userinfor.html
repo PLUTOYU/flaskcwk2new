@@ -1,0 +1,61 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/css/sign.css">
+    <u><title>To-do-List:edit</title></u>
+{% endblock %}
+
+
+{% block content %}
+<div class="text-center" id="login">
+  <form class="form-sign" method="POST" >
+    {{ form.hidden_tag() }}
+    <h1 class="h3 mb-3 font-weight-normal">Eidit user info</h1>
+    <div class="from-group input-group mb-3">
+      {{ form.username.label }}
+      {{ form.username(class_='form-control') }}
+      {% if form.username.errors %}
+      <div class="invalid-feedback">
+        {% for error in form.username.errors %}{{ error }}{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    <div class="form-group">
+      {{ form.gender.label }}
+      {{ form.gender(class_='form-control') }}
+      {% if form.gender.errors %}
+      <div class="invalid-feedback">
+        {% for error in form.gender.errors %}{{ error }}{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    <div class="form-group">
+      {{ form.discription.label }}
+      {{ form.discription(class_='form-control') }}
+      {% if form.discription.errors %}
+      <div class="invalid-feedback">
+        {% for error in form.discription.errors %}{{ error }}{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Save</button>
+  </form>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-dismissible fade show message {{ category }}" role="alert">
+        <span id="message">
+          {{ message }}
+        </span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+      </div>
+    {% endfor %}
+  {% endif %}
+  {% endwith %}
+</div>
+{% endblock %}
+

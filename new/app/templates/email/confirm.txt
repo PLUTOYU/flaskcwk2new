@@ -1,0 +1,10 @@
+Dear
+
+Welcome to Blog!
+
+To confirm your account, please copy the numbers to  the email verification code:
+
+{{code}}
+
+sincerely,
+The Blog Team

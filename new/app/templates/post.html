@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+
+       <a href="/"><button type="button" class="btn btn-primary">Back to Blog square</button></a>
+        <p></p>
+
+  <div class="post p-4">
+    <h2 class="blog-post-title">
+      Title : {{ post.title }}</h2>
+    <p class="blog-post-meta">
+      {{ post.created_on.strftime('%Y-%m-%d %I:%M %p') }} By {{ post.user.username }}
+    </p>
+    <div class="text-right">
+      {% if post.user.id == session['user_id'] %}
+      <a href="{{ url_for('edit_post', id=post.id) }}" class="btn btn-primary">Edit</a>
+      <a href="{{ url_for('delete_post', id=post.id) }}" class="btn btn-danger">Delete</a>
+      {% elif post.user.id != session['user_id'] and session['user_id'] %}
+      {% if not post.user in user.following %}
+      <a href="{{ url_for('follow', id=post.user.id, pid=post.id) }}" class="btn btn-primary">follow</a>
+      {% else %}
+      <a href="{{ url_for('unfollow', id=post.user.id, pid=post.id) }}" class="btn btn-danger">unfollow</a>
+      {% endif %}
+      {% endif %}
+    </div>
+
+    <p>{{ post.content }}</p>
+  </div> 
+  <div class="comment p-3 mt-5">
+    {% if session['user_id'] %}
+    <form action="{{ url_for('post', id=post.id) }}{% if cid %}?cid={{ cid }}{% endif %}" method="POST" class="border-bottom pb-3">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        {{ form.text.label }}
+        {{ form.text(class_='form-control') }}
+        {% if form.text.errors %}
+        <div class="invalid-feedback">
+          {% for error in form.text.errors %}{{ error }}{% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    {% endif %}
+    {% for comment in post.comments %}
+    <div class="m-3 text">
+      <div>
+        {{ comment.user.username }}: {{ comment.text }} 
+      </div>
+      <div>
+        {% if comment.user.id == session['user_id'] %}
+        <a href="{{ url_for('post', id=post.id) }}?cid={{comment.id}}" class="btn btn-primary">Edit</a>
+        <a href="{{ url_for('delete_comment', id=comment.id, pid=post.id) }}" class="btn btn-danger">Delete</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

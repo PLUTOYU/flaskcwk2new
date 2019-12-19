@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+    {% block head %}
+{{moment.include_moment()}}
+         {{moment.include_jquery()}}
+        <link rel="stylesheet" href="/static/css/userPage.css">
+    {% endblock %}
+{% block content %}  <div class="jumbotron">
+    {% if session['user_id'] != user.id %}
+       <a href="/user{{ session['user_id'] }}"><button type="button" class="btn btn-primary">Back to my profile</button></a>
+        <p></p>
+    {% endif %}
+<div class="card ">
+<div class="row">
+  <div class="col-3">
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        {% if session['user_id'] == user.id %}
+      <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-disabled="true">Profile</a>
+      <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-disabled="true">my Blogs</a>
+      <a class="nav-link" id="v-pills-messages-tab" data-toggle="pill" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-disabled="true">my following</a>
+      <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-disabled="true">my followers</a>
+      <a class="nav-link" id="v-pills-contact-tab" data-toggle="pill" href="#v-pills-contact" role="tab" aria-controls="v-pills-settings" aria-disabled="true">my comments</a>
+        {% else %}
+              <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-disabled="true">Profile</a>
+      <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-disabled="true">Blogs</a>
+      <a class="nav-link" id="v-pills-messages-tab" data-toggle="pill" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-disabled="true">following</a>
+      <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-disabled="true">followers</a>
+         <a class="nav-link" id="v-pills-contact-tab" data-toggle="pill" href="#v-pills-contact" role="tab" aria-controls="v-pills-settings" aria-disabled="true">comments</a>
+        {% endif %}
+    </div>
+  </div>
+  <div class="col-9">
+    <div class="tab-content" id="v-pills-tabContent">
+      <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-disabled="true">
+          <div class="container">
+    <h1 class="display-3">{{ user.username }}</h1>
+         {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+          <!--<p>Now is {{ current_time }}</p>-->
+         <p>Member since {{ moment(user.created_on).format('L') }}.
+             Last seen {{ moment(user.last_seen).fromTime(current_time) }}.</p>
+          {% if session['user_id'] == user.id %}
+        <td><a href="/eidtInfo/{{ user.id }}"><button type="button" class="btn btn-primary">Edit my profile</button></a></td>
+              <p></p>
+          {% endif %}
+  </div>
+      </div>
+      <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-disabled="true">
+   <div id="table_total">  <!--list the queried task-->
+        <div id="table_t">
+            <table class="table table-hover">
+                <thead>
+                       <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Create time</th>
+                              <th scope="col">Blog name</th>
+                               <th scope="col"></th>
+                            <th scope="col"></th>
+                           <th scope="col"></th>
+                          </tr>
+                        </thead>
+                 <tbody>
+                     {% for post in posts %}
+                     <tr>
+                         <td scope="row">{{ loop.index }}</td>
+                         <td scope="row">{{ post.created_on.strftime('%Y-%m-%d %I:%M %p') }}</td>
+                         <td scope="row">{{post.title}}</td>
+                         <td scope="row">
+                             <a href="{{ url_for('post', id=post.id) }}" class="btn btn-primary">View</a>
+                         </td>
+                         {% if session['user_id'] == user.id %}
+                         <td scope="row">
+                             <a href="{{ url_for('edit_post', id=post.id) }}" class="btn btn-primary">Edit</a>
+                         </td>
+                         <td scope="row"> <a href="{{ url_for('delete_post', id=post.id) }}" class="btn btn-danger">Delete</a></td>
+                         {% endif %}
+                     </tr>
+                     {% endfor %}
+                    </tbody>
+            </table>
+      </div> </div></div>
+      <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-disabled="true">
+<div id="table_total">  <!--list the queried task-->
+        <div id="table_t">
+            <table class="table table-hover">
+                <thead>
+                       <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">user name</th>
+                              <th scope="col">about user</th>
+                              <th scope="col">email</th>
+                              <th scope="col"></th>
+                           <th scope="col"></th>
+                           <th scope="col"></th>
+                          </tr>
+                        </thead>
+                 <tbody>
+                     {% for following in following %}
+                     <tr>
+                         <td scope="row">{{ loop.index }}</td>
+                         <td scope="row">{{following.username}}</td>
+                         <td scope="row">{{following.about_me}}</td>
+                         <td scope="row">{{following.email}}</td>
+                         <td scope="row"><a href="/user{{ following.id }}"><button type="button" class="btn btn-primary">View</button></a></td>
+                         <td scope="row"><a href="/Blogs/{{ following.id }}" class="btn btn-primary">Blogs</a></td>
+                         {% if session['user_id'] == user.id %}
+                         <td scope="row"><a href="{{ url_for('unfollow', id=following.id, pid=following.id) }}" class="btn btn-danger">unfollow</a></td>
+                         {% endif %}
+                     </tr>
+                     {% endfor %}
+                    </tbody>
+            </table>
+      </div> </div>
+      </div>
+      <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-disabled="true">
+          <div id="table_total">  <!--list the queried task-->
+        <div id="table_t">
+            <table class="table table-hover">
+                <thead>
+                       <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">user name</th>
+                              <th scope="col">about user</th>
+                              <th scope="col">email</th>
+                              <th scope="col"></th>
+                           <th scope="col"></th>
+                          </tr>
+                        </thead>
+                 <tbody>
+                     {% for followers in followers %}
+                     <tr>
+                         <td scope="row">{{ loop.index }}</td>
+                         <td scope="row">{{followers.username}}</td>
+                         <td scope="row">{{followers.about_me}}</td>
+                         <td scope="row">{{followers.email}}</td>
+                         <td scope="row"><a href="/user{{ followers.id }}"><button type="button" class="btn btn-primary">View</button></a></td>
+                         <td scope="row"><a href="/Blogs/{{ followers.id }}" class="btn btn-primary">Blogs</a></td>
+                     </tr>
+                     {% endfor %}
+                    </tbody>
+            </table>
+      </div> </div>
+
+      </div>
+     <div class="tab-pane fade" id="v-pills-contact" role="tabpanel" aria-disabled="true">
+
+          <div id="table_total">  <!--list the queried task-->
+        <div id="table_t">
+            <table class="table table-hover">
+                <thead>
+                       <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">blog name</th>
+                              <th scope="col">comment</th>
+                              <th scope="col"></th>
+                           <th scope="col"></th>
+                           <th scope="col"></th>
+                          </tr>
+                        </thead>
+                 <tbody>
+                     {% for comment in comments %}
+                     <tr>
+                         <td scope="row">{{ loop.index }}</td>
+                         <td scope="row">{{comment.post.title}}</td>
+                         <td scope="row">{{comment.text}}</td>
+                         <td scope="row"><a href="{{ url_for('post', id=comment.post.id) }}"><button type="button" class="btn btn-primary">Blog</button></a></td>
+
+                         <td scope="row">
+                             <a href="/Blogs/{{ comment.id }}" class="btn btn-primary">View</a>
+                         </td>
+                         {% if session['user_id'] == user.id %}
+                         <td scope="row">
+                             <a href="{{ url_for('post', id=comment.post.id) }}?cid={{comment.id}}" class="btn btn-primary">Edit</a>
+                         </td>
+                         <td scope="row"> <a href="{{ url_for('delete_comment', id=comment.id, pid=comment.post.id) }}" class="btn btn-danger">Delete</a></td>
+                         {% endif %}
+                     </tr>
+                     {% endfor %}
+                    </tbody>
+            </table>
+      </div> </div>
+
+      </div>
+
+
+</div>
+  </div></div></div></div>
+
+{% endblock %}
+      <!--     <div class="container">
+        <h4>my blogs lists</h4>
+    <table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Dicription</th>
+      <th scope="col">Handle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Jacob</td>
+      <td>Thornton</td>
+      <td>@fat</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td colspan="2">Larry the Bird</td>
+      <td>@twitter</td>
+    </tr>
+  </tbody>
+</table>
+</div>-->
